@@ -1,0 +1,115 @@
+Sales & Customer Analytics - DAX Measures 
+
+
+Total Sales =
+SUMX(
+    SALES_ORDER_DETAILS,
+    SALES_ORDER_DETAILS[QUANTITY]
+        * SALES_ORDER_DETAILS[UNIT_PRICE]
+        * (1 - SALES_ORDER_DETAILS[DISCOUNT_PERCENT] / 100)
+)
+
+Total Quantity =
+SUM(SALES_ORDER_DETAILS[QUANTITY])
+
+Total Orders =
+DISTINCTCOUNT(SALES_ORDERS[ORDER_ID])
+
+Average Order Value =
+DIVIDE(
+    [Total Sales],
+    [Total Orders]
+)
+
+Total Discount =
+SUMX(
+    SALES_ORDER_DETAILS,
+    SALES_ORDER_DETAILS[QUANTITY]
+        * SALES_ORDER_DETAILS[UNIT_PRICE]
+        * (SALES_ORDER_DETAILS[DISCOUNT_PERCENT] / 100)
+)
+
+Gross Sales =
+SUMX(
+    SALES_ORDER_DETAILS,
+    SALES_ORDER_DETAILS[QUANTITY]
+        * SALES_ORDER_DETAILS[UNIT_PRICE]
+)
+
+Total Cost =
+SUMX(
+    SALES_ORDER_DETAILS,
+    SALES_ORDER_DETAILS[QUANTITY]
+        * RELATED(SALES_PRODUCTS[COST_PRICE])
+)
+
+Total Profit =
+[Total Sales] - [Total Cost]
+
+Profit Margin % =
+DIVIDE(
+    [Total Profit],
+    [Total Sales],
+    0
+)
+
+Total Target =
+SUM(SALES_TARGETS[TARGET_AMOUNT])
+
+Target Achievement % =
+DIVIDE(
+    [Total Sales],
+    [Total Target],
+    0
+)
+
+Target Variance =
+[Total Sales] - [Total Target]
+
+Total Customers =
+DISTINCTCOUNT(SALES_CUSTOMERS[CUSTOMER_ID])
+
+Average Sales per Customer =
+DIVIDE(
+    [Total Sales],
+    [Total Customers],
+    0
+)
+
+Average Discount % =
+AVERAGE(SALES_ORDER_DETAILS[DISCOUNT_PERCENT])
+
+Total Products =
+DISTINCTCOUNT(SALES_PRODUCTS[PRODUCT_ID])
+
+Total Employees =
+DISTINCTCOUNT(SALES_EMPLOYEES[EMPLOYEE_ID])
+
+Completed Orders =
+CALCULATE(
+    [Total Orders],
+    SALES_ORDERS[ORDER_STATUS] = "Completed"
+)
+
+Cancelled Orders =
+CALCULATE(
+    [Total Orders],
+    SALES_ORDERS[ORDER_STATUS] = "Cancelled"
+)
+
+Repeat Customers =
+COUNTROWS(
+    FILTER(
+        VALUES(SALES_CUSTOMERS[CUSTOMER_ID]),
+        CALCULATE(
+            DISTINCTCOUNT(SALES_ORDERS[ORDER_ID])
+        ) > 1
+    )
+)
+
+Repeat Customer Rate % =
+DIVIDE(
+    [Repeat Customers],
+    [Total Customers],
+    0
+)
