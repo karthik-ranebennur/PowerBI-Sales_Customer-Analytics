@@ -1,0 +1,596 @@
+POWER BI PROJECT 2 – SALES & CUSTOMER ANALYTICS
+================================================
+
+RELATIONSHIP NOTES
+================================================
+
+1. SALES_REGIONS → SALES_EMPLOYEES
+------------------------------------------------
+Relationship:
+SALES_REGIONS[REGION_ID]
+        ↓
+SALES_EMPLOYEES[REGION_ID]
+
+Relationship Type:
+One-to-Many (1:*)
+
+Cross Filter Direction:
+Single
+
+Active:
+Yes
+
+Why this relationship?
+SALES_REGIONS contains one unique record for each region.
+SALES_EMPLOYEES contains multiple employees belonging to a region.
+
+REGION_ID is used because it is the common key between the two tables.
+
+SALES_REGIONS = Parent/lookup table
+SALES_EMPLOYEES = Child/detail table
+
+Example:
+REGION_ID 1 → Region 1
+REGION_ID 1 → Employee A
+REGION_ID 1 → Employee B
+REGION_ID 1 → Employee C
+
+One region can have many employees.
+
+Why SALES_REGIONS?
+It stores the master information about regions.
+
+Why SALES_EMPLOYEES?
+Each employee belongs to a region and therefore contains REGION_ID.
+
+
+2. SALES_ORDERS → SALES_ORDER_DETAILS
+------------------------------------------------
+Relationship:
+SALES_ORDERS[ORDER_ID]
+        ↓
+SALES_ORDER_DETAILS[ORDER_ID]
+
+Relationship Type:
+One-to-Many (1:*)
+
+Cross Filter Direction:
+Single
+
+Active:
+Yes
+
+Why this relationship?
+One order can contain multiple products/order-detail records.
+
+ORDER_ID uniquely identifies an order in SALES_ORDERS.
+The same ORDER_ID can appear multiple times in
+SALES_ORDER_DETAILS because one order can contain multiple items.
+
+SALES_ORDERS = Parent/Header table
+SALES_ORDER_DETAILS = Child/Line-item table
+
+Example:
+ORDER_ID 1001 → One order
+ORDER_ID 1001 → Product A
+ORDER_ID 1001 → Product B
+ORDER_ID 1001 → Product C
+
+Why ORDER_ID?
+It is the common key that identifies which order each detail
+record belongs to.
+
+
+3. SALES_PRODUCTS → SALES_ORDER_DETAILS
+------------------------------------------------
+Relationship:
+SALES_PRODUCTS[PRODUCT_ID]
+        ↓
+SALES_ORDER_DETAILS[PRODUCT_ID]
+
+Relationship Type:
+One-to-Many (1:*)
+
+Cross Filter Direction:
+Single
+
+Active:
+Yes
+
+Why this relationship?
+One product can appear in many order-detail records because the
+same product can be sold in many different orders.
+
+SALES_PRODUCTS contains the master/product information.
+SALES_ORDER_DETAILS contains the individual products sold in orders.
+
+SALES_PRODUCTS = Product lookup/master table
+SALES_ORDER_DETAILS = Transaction/detail table
+
+Example:
+PRODUCT_ID 101 → Laptop
+PRODUCT_ID 101 → Order 1001
+PRODUCT_ID 101 → Order 1005
+PRODUCT_ID 101 → Order 1020
+
+Why PRODUCT_ID?
+It uniquely identifies a product and connects the product master
+information to the products actually sold.
+
+
+4. SALES_CUSTOMERS → SALES_ORDERS
+------------------------------------------------
+Relationship:
+SALES_CUSTOMERS[CUSTOMER_ID]
+        ↓
+SALES_ORDERS[CUSTOMER_ID]
+
+Relationship Type:
+One-to-Many (1:*)
+
+Cross Filter Direction:
+Single
+
+Active:
+Yes
+
+Why this relationship?
+One customer can place many orders.
+
+SALES_CUSTOMERS contains one record for each customer.
+SALES_ORDERS contains multiple orders placed by customers.
+
+SALES_CUSTOMERS = Customer master/lookup table
+SALES_ORDERS = Transaction table
+
+Example:
+CUSTOMER_ID 501 → Customer A
+CUSTOMER_ID 501 → Order 1001
+CUSTOMER_ID 501 → Order 1010
+CUSTOMER_ID 501 → Order 1050
+
+Why CUSTOMER_ID?
+It uniquely identifies the customer and tells us which customer
+placed each order.
+
+This relationship allows analysis such as:
+- Sales by customer
+- Orders by customer
+- Customer type analysis
+- Customer performance
+
+
+5. SALES_EMPLOYEES → SALES_ORDERS
+------------------------------------------------
+Relationship:
+SALES_EMPLOYEES[EMPLOYEE_ID]
+        ↓
+SALES_ORDERS[EMPLOYEE_ID]
+
+Relationship Type:
+One-to-Many (1:*)
+
+Cross Filter Direction:
+Single
+
+Active:
+Yes
+
+Why this relationship?
+One employee can handle/create many orders.
+
+SALES_EMPLOYEES contains employee master information.
+SALES_ORDERS contains the employee responsible for each order.
+
+SALES_EMPLOYEES = Employee lookup/master table
+SALES_ORDERS = Transaction table
+
+Example:
+EMPLOYEE_ID 101 → Employee A
+EMPLOYEE_ID 101 → Order 1001
+EMPLOYEE_ID 101 → Order 1015
+EMPLOYEE_ID 101 → Order 1030
+
+Why EMPLOYEE_ID?
+It identifies which employee is associated with each order.
+
+This relationship allows:
+- Sales by employee
+- Orders by employee
+- Employee performance analysis
+
+
+6. SALES_CATEGORIES → SALES_PRODUCTS
+------------------------------------------------
+Relationship:
+SALES_CATEGORIES[CATEGORY_ID]
+        ↓
+SALES_PRODUCTS[CATEGORY_ID]
+
+Relationship Type:
+One-to-Many (1:*)
+
+Cross Filter Direction:
+Single
+
+Active:
+Yes
+
+Why this relationship?
+One category can contain many products.
+
+SALES_CATEGORIES contains the category master information.
+SALES_PRODUCTS contains individual products and their category.
+
+SALES_CATEGORIES = Category lookup/master table
+SALES_PRODUCTS = Product table
+
+Example:
+CATEGORY_ID 10 → Electronics
+CATEGORY_ID 10 → Product A
+CATEGORY_ID 10 → Product B
+CATEGORY_ID 10 → Product C
+
+Why CATEGORY_ID?
+It identifies which category each product belongs to.
+
+This relationship allows:
+- Sales by category
+- Product analysis by category
+- Category performance
+
+
+7. SALES_REGIONS → SALES_TARGETS
+------------------------------------------------
+Relationship:
+SALES_REGIONS[REGION_ID]
+        ↓
+SALES_TARGETS[REGION_ID]
+
+Relationship Type:
+One-to-Many (1:*)
+
+Cross Filter Direction:
+Single
+
+Active:
+Yes
+
+Why this relationship?
+A region can have multiple target records, generally for different
+target months.
+
+SALES_REGIONS contains the master list of regions.
+SALES_TARGETS contains target amounts assigned to regions.
+
+SALES_REGIONS = Region lookup/master table
+SALES_TARGETS = Target/fact table
+
+Example:
+REGION_ID 1 → Region North
+REGION_ID 1 → Jan Target
+REGION_ID 1 → Feb Target
+REGION_ID 1 → Mar Target
+
+Why REGION_ID?
+It identifies which region the target belongs to.
+
+This relationship allows:
+- Target by region
+- Regional target comparison
+- Actual sales vs regional target
+
+
+8. SALES_REGIONS → SALES_ORDERS
+------------------------------------------------
+Relationship:
+SALES_REGIONS[REGION_ID]
+        ↓
+SALES_ORDERS[REGION_ID]
+
+Relationship Type:
+One-to-Many (1:*)
+
+Cross Filter Direction:
+Single
+
+Active:
+NO – INACTIVE
+
+Why is it inactive?
+SALES_ORDERS already has another active path to SALES_REGIONS:
+
+SALES_REGIONS
+      ↓
+SALES_EMPLOYEES
+      ↓
+SALES_ORDERS
+
+At the same time, there is a direct path:
+
+SALES_REGIONS
+      ↓
+SALES_ORDERS
+
+If both paths were active, Power BI could have multiple possible
+filter paths between SALES_REGIONS and SALES_ORDERS.
+
+This creates an ambiguous relationship/filter path.
+
+Therefore Power BI keeps the direct relationship inactive.
+
+Why REGION_ID?
+SALES_REGIONS identifies the region.
+SALES_ORDERS stores the region associated with the order.
+
+Important:
+DO NOT activate this relationship just because it exists.
+
+The inactive relationship can be used deliberately in DAX when
+needed, using USERELATIONSHIP().
+
+For the normal model, we leave it inactive.
+
+
+9. Calendar → SALES_ORDERS
+------------------------------------------------
+Relationship:
+Calendar[Date]
+        ↓
+SALES_ORDERS[ORDER_DATE]
+
+Relationship Type:
+One-to-Many (1:*)
+
+Cross Filter Direction:
+Single
+
+Active:
+Yes
+
+Why this relationship?
+Calendar contains one row for each date.
+SALES_ORDERS can contain many orders on the same date.
+
+Calendar = Date dimension
+SALES_ORDERS = Transaction/fact table
+
+Example:
+Calendar[Date] = 01-Jan-2025
+        ↓
+Order 1001 – 01-Jan-2025
+Order 1002 – 01-Jan-2025
+Order 1003 – 01-Jan-2025
+
+Why Date?
+ORDER_DATE tells us when the order occurred.
+
+This relationship allows:
+- Daily sales
+- Monthly sales
+- Yearly sales
+- Year-over-year analysis
+- Sales trends
+- Date slicers
+
+
+10. Calendar → SALES_TARGETS
+------------------------------------------------
+Relationship:
+Calendar[Date]
+        ↓
+SALES_TARGETS[TARGET_MONTH]
+
+Relationship Type:
+One-to-Many (1:*)
+
+Cross Filter Direction:
+Single
+
+Active:
+Yes
+
+Why this relationship?
+SALES_TARGETS contains target records for specific months.
+Calendar contains the corresponding dates/months.
+
+Calendar = Date dimension
+SALES_TARGETS = Target/fact table
+
+TARGET_MONTH contains dates such as:
+01-Jan-2023
+01-Feb-2023
+01-Mar-2023
+etc.
+
+Why TARGET_MONTH?
+It identifies the month to which each target amount belongs.
+
+This relationship allows:
+- Monthly target analysis
+- Target by year
+- Target vs actual sales
+- Monthly target trends
+
+
+================================================
+SUMMARY OF THE MODEL
+================================================
+
+LOOKUP / DIMENSION TABLES:
+--------------------------
+Calendar
+SALES_CUSTOMERS
+SALES_PRODUCTS
+SALES_CATEGORIES
+SALES_REGIONS
+SALES_EMPLOYEES
+
+
+TRANSACTION / FACT-LIKE TABLES:
+-------------------------------
+SALES_ORDERS
+SALES_ORDER_DETAILS
+SALES_TARGETS
+
+
+MAIN MODEL FLOW:
+================================================
+
+Calendar
+   |
+   +--------------------> SALES_ORDERS
+   |                          |
+   |                          +----> SALES_ORDER_DETAILS
+   |                          |
+   |                          +----> SALES_CUSTOMERS
+   |                          |
+   |                          +----> SALES_EMPLOYEES
+   |
+   +--------------------> SALES_TARGETS
+                               |
+                               |
+SALES_REGIONS -----------------+
+   |
+   +----> SALES_EMPLOYEES
+
+
+PRODUCT SIDE:
+================================================
+
+SALES_CATEGORIES
+       |
+       ↓
+SALES_PRODUCTS
+       |
+       ↓
+SALES_ORDER_DETAILS
+
+
+CUSTOMER SIDE:
+================================================
+
+SALES_CUSTOMERS
+       |
+       ↓
+SALES_ORDERS
+       |
+       ↓
+SALES_ORDER_DETAILS
+
+
+EMPLOYEE / REGION SIDE:
+================================================
+
+SALES_REGIONS
+       |
+       ↓
+SALES_EMPLOYEES
+       |
+       ↓
+SALES_ORDERS
+       |
+       ↓
+SALES_ORDER_DETAILS
+
+
+TARGET SIDE:
+================================================
+
+SALES_REGIONS
+       |
+       ↓
+SALES_TARGETS
+       ↑
+       |
+    Calendar
+
+
+IMPORTANT POWER BI CONCEPT
+================================================
+
+The general design is:
+
+DIMENSION / LOOKUP TABLE
+          ↓
+FACT / TRANSACTION TABLE
+
+One-to-Many (1:*) is used because the lookup table normally has
+one unique record for the key, while the transaction table can
+contain many records with that same key.
+
+Example:
+
+One Customer
+     ↓
+Many Orders
+
+One Product
+     ↓
+Many Order Details
+
+One Employee
+     ↓
+Many Orders
+
+One Region
+     ↓
+Many Employees
+
+One Region
+     ↓
+Many Targets
+
+One Date
+     ↓
+Many Orders
+
+One Date
+     ↓
+Many Targets
+
+
+WHY SINGLE CROSS-FILTER?
+================================================
+
+We are using Single direction for these relationships so that
+filters normally flow from the lookup/dimension side toward the
+transaction/fact side.
+
+Example:
+
+SALES_CUSTOMERS
+      ↓
+SALES_ORDERS
+      ↓
+SALES_ORDER_DETAILS
+
+If a customer is selected in a slicer, Power BI can filter the
+related orders and order details.
+
+This avoids unnecessary bidirectional filtering and helps prevent
+ambiguous filter paths.
+
+
+IMPORTANT:
+================================================
+
+SALES_ORDERS[REGION_ID] → SALES_REGIONS[REGION_ID]
+
+exists but is INACTIVE.
+
+Reason:
+There is already an active path:
+
+SALES_REGIONS
+      ↓
+SALES_EMPLOYEES
+      ↓
+SALES_ORDERS
+
+Therefore the direct Region → Orders relationship is inactive
+to avoid ambiguity.
+
+Do not activate it unless we specifically need it in a DAX
+calculation using USERELATIONSHIP().
+================================================
