@@ -56,8 +56,18 @@ Project Files
 
 Project dashboard, SQL queries, DAX measures, data model, and dashboard screenshots will be added to this repository.
 
+
 Author
 
 Karthik R K
+
+Dashboard Screenshots
+
+1. Executive Dashboard
+2. Customer Analytics
+3. Product & Category Analysis
+4. Regional Performance
+5. Employee Performance
+6. Order Details
 
 Power BI | SQL | DAX | Power Query | Data Analytics
