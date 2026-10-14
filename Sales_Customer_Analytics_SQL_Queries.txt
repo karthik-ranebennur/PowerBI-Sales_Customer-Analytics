@@ -1,0 +1,624 @@
+			PROJECT 2 - SALES & CUSTOMER ANALYTICS
+
+
+Project objective
+
+Build a realistic Sales & Customer Analytics project using Oracle SQL as the source and Power BI for:
+
+* Sales analysis
+* Profit analysis
+* Customer analysis
+* Product/category analysis
+* Regional analysis
+* Salesperson analysis
+* Sales vs Target
+* Order/payment analysis
+* DAX and Power BI interview preparation
+
+
+
+Table				Purpose		 		 Rows
+
+SALES_CATEGORIES		Product categories		5
+
+SALES_PRODUCTS			Product master			20
+
+SALES_CUSTOMERS			Customer master			1,000
+
+SALES_REGIONS			Sales regions			16
+
+SALES_EMPLOYEES 		Sales employees			50	
+
+SALES_ORDERS			Order header			10,000
+
+SALES_ORDER_DETAILS		Order line items		50,000
+
+SALES_TARGETS			Monthly regional targets	768
+
+
+
+Total rows: 61,859
+
+==========================
+
+SALES_CATAGORIES
+
+CREATE TABLE SALES_CATEGORIES (
+    CATEGORY_ID NUMBER PRIMARY KEY,
+    CATEGORY_NAME VARCHAR2(50) NOT NULL
+);
+
+
+INSERT INTO SALES_CATEGORIES VALUES (1, 'Electronics');
+INSERT INTO SALES_CATEGORIES VALUES (2, 'Furniture');
+INSERT INTO SALES_CATEGORIES VALUES (3, 'Office Supplies');
+INSERT INTO SALES_CATEGORIES VALUES (4, 'Clothing');
+INSERT INTO SALES_CATEGORIES VALUES (5, 'Home Appliances');
+
+COMMIT;
+
+
+Categories
+
+1. Electronics
+2. Furniture
+3. Office Supplies
+4. Clothing
+5. Home Appliances
+
+
+SALES_PRODUCTS
+
+CREATE TABLE SALES_PRODUCTS (
+    PRODUCT_ID NUMBER PRIMARY KEY,
+    PRODUCT_NAME VARCHAR2(100) NOT NULL,
+    CATEGORY_ID NUMBER NOT NULL,
+    UNIT_PRICE NUMBER(10,2) NOT NULL,
+    COST_PRICE NUMBER(10,2) NOT NULL,
+    CONSTRAINT FK_PRODUCT_CATEGORY
+        FOREIGN KEY (CATEGORY_ID)
+        REFERENCES SALES_CATEGORIES(CATEGORY_ID)
+);
+
+INSERT INTO SALES_PRODUCTS VALUES (101, 'Laptop', 1, 65000, 52000);
+INSERT INTO SALES_PRODUCTS VALUES (102, 'Smartphone', 1, 30000, 24000);
+INSERT INTO SALES_PRODUCTS VALUES (103, 'Tablet', 1, 22000, 17500);
+INSERT INTO SALES_PRODUCTS VALUES (104, 'Monitor', 1, 18000, 14000);
+
+INSERT INTO SALES_PRODUCTS VALUES (105, 'Office Chair', 2, 8500, 6000);
+INSERT INTO SALES_PRODUCTS VALUES (106, 'Office Desk', 2, 15000, 10500);
+INSERT INTO SALES_PRODUCTS VALUES (107, 'Bookshelf', 2, 9000, 6500);
+INSERT INTO SALES_PRODUCTS VALUES (108, 'Conference Table', 2, 28000, 20000);
+
+INSERT INTO SALES_PRODUCTS VALUES (109, 'Printer Paper', 3, 450, 300);
+INSERT INTO SALES_PRODUCTS VALUES (110, 'Notebook', 3, 180, 100);
+INSERT INTO SALES_PRODUCTS VALUES (111, 'Stapler', 3, 250, 140);
+INSERT INTO SALES_PRODUCTS VALUES (112, 'Pen Set', 3, 150, 80);
+
+INSERT INTO SALES_PRODUCTS VALUES (113, 'Formal Shirt', 4, 1800, 1100);
+INSERT INTO SALES_PRODUCTS VALUES (114, 'Formal Trousers', 4, 2200, 1400);
+INSERT INTO SALES_PRODUCTS VALUES (115, 'Jacket', 4, 4500, 3000);
+INSERT INTO SALES_PRODUCTS VALUES (116, 'Sports Shoes', 4, 3500, 2300);
+
+INSERT INTO SALES_PRODUCTS VALUES (117, 'Refrigerator', 5, 42000, 34000);
+INSERT INTO SALES_PRODUCTS VALUES (118, 'Washing Machine', 5, 35000, 28000);
+INSERT INTO SALES_PRODUCTS VALUES (119, 'Microwave Oven', 5, 12000, 9000);
+INSERT INTO SALES_PRODUCTS VALUES (120, 'Air Conditioner', 5, 48000, 39000);
+
+COMMIT;
+
+Important
+
+UNIT_PRICE = selling price
+
+COST_PRICE = company/product cost
+
+Therefore:
+
+Profit = Sales − Cost
+
+SALES_CUSTOMERS
+
+CREATE TABLE SALES_CUSTOMERS (
+    CUSTOMER_ID NUMBER PRIMARY KEY,
+    CUSTOMER_NAME VARCHAR2(100) NOT NULL,
+    CITY VARCHAR2(50),
+    STATE VARCHAR2(50),
+    CUSTOMER_TYPE VARCHAR2(30),
+    JOIN_DATE DATE
+);
+
+We initially created sample customers and later replaced them with 1,000 generated customers.
+
+DELETE FROM SALES_CUSTOMERS;
+
+COMMIT;
+
+INSERT INTO SALES_CUSTOMERS
+    (CUSTOMER_ID,
+     CUSTOMER_NAME,
+     CITY,
+     STATE,
+     CUSTOMER_TYPE,
+     JOIN_DATE)
+SELECT
+    1000 + LEVEL,
+    'Customer ' || LEVEL,
+    CASE MOD(LEVEL - 1, 16)
+        WHEN 0 THEN 'Bengaluru'
+        WHEN 1 THEN 'Mysuru'
+        WHEN 2 THEN 'Mangaluru'
+        WHEN 3 THEN 'Chennai'
+        WHEN 4 THEN 'Hyderabad'
+        WHEN 5 THEN 'Kochi'
+        WHEN 6 THEN 'Mumbai'
+        WHEN 7 THEN 'Pune'
+        WHEN 8 THEN 'Ahmedabad'
+        WHEN 9 THEN 'Jaipur'
+        WHEN 10 THEN 'New Delhi'
+        WHEN 11 THEN 'Lucknow'
+        WHEN 12 THEN 'Kolkata'
+        WHEN 13 THEN 'Bhubaneswar'
+        WHEN 14 THEN 'Guwahati'
+        ELSE 'Patna'
+    END,
+    CASE MOD(LEVEL - 1, 16)
+        WHEN 0 THEN 'Karnataka'
+        WHEN 1 THEN 'Karnataka'
+        WHEN 2 THEN 'Karnataka'
+        WHEN 3 THEN 'Tamil Nadu'
+        WHEN 4 THEN 'Telangana'
+        WHEN 5 THEN 'Kerala'
+        WHEN 6 THEN 'Maharashtra'
+        WHEN 7 THEN 'Maharashtra'
+        WHEN 8 THEN 'Gujarat'
+        WHEN 9 THEN 'Rajasthan'
+        WHEN 10 THEN 'Delhi'
+        WHEN 11 THEN 'Uttar Pradesh'
+        WHEN 12 THEN 'West Bengal'
+        WHEN 13 THEN 'Odisha'
+        WHEN 14 THEN 'Assam'
+        ELSE 'Bihar'
+    END,
+    CASE MOD(LEVEL - 1, 3)
+        WHEN 0 THEN 'Corporate'
+        WHEN 1 THEN 'Small Business'
+        ELSE 'Retail'
+    END,
+    DATE '2022-01-01' + TRUNC(DBMS_RANDOM.VALUE(0, 1400))
+FROM DUAL
+CONNECT BY LEVEL <= 1000;
+
+COMMIT;
+
+Important SQL concepts
+
+We used:
+
+* CONNECT BY LEVEL
+* MOD()
+* CASE
+* DBMS_RANDOM.VALUE
+* TRUNC()
+* DATE
+* String concatenation ||
+
+
+SALES_REGIONS
+
+CREATE TABLE SALES_REGIONS (
+    REGION_ID NUMBER PRIMARY KEY,
+    REGION_NAME VARCHAR2(50) NOT NULL,
+    ZONE_NAME VARCHAR2(30) NOT NULL
+);
+
+INSERT INTO SALES_REGIONS VALUES (1, 'Bengaluru South', 'South');
+INSERT INTO SALES_REGIONS VALUES (2, 'Mysuru South', 'South');
+INSERT INTO SALES_REGIONS VALUES (3, 'Mangaluru South', 'South');
+INSERT INTO SALES_REGIONS VALUES (4, 'Chennai South', 'South');
+INSERT INTO SALES_REGIONS VALUES (5, 'Hyderabad South', 'South');
+INSERT INTO SALES_REGIONS VALUES (6, 'Kochi South', 'South');
+
+INSERT INTO SALES_REGIONS VALUES (7, 'Mumbai West', 'West');
+INSERT INTO SALES_REGIONS VALUES (8, 'Pune West', 'West');
+INSERT INTO SALES_REGIONS VALUES (9, 'Ahmedabad West', 'West');
+
+INSERT INTO SALES_REGIONS VALUES (10, 'Jaipur North', 'North');
+INSERT INTO SALES_REGIONS VALUES (11, 'New Delhi North', 'North');
+INSERT INTO SALES_REGIONS VALUES (12, 'Lucknow North', 'North');
+
+INSERT INTO SALES_REGIONS VALUES (13, 'Kolkata East', 'East');
+INSERT INTO SALES_REGIONS VALUES (14, 'Bhubaneswar East', 'East');
+INSERT INTO SALES_REGIONS VALUES (15, 'Guwahati East', 'East');
+INSERT INTO SALES_REGIONS VALUES (16, 'Patna East', 'East');
+
+COMMIT;
+
+SALES_EMPLOYEES
+
+CREATE TABLE SALES_EMPLOYEES (
+    EMPLOYEE_ID NUMBER PRIMARY KEY,
+    EMPLOYEE_NAME VARCHAR2(100) NOT NULL,
+    REGION_ID NUMBER NOT NULL,
+    JOIN_DATE DATE,
+    DESIGNATION VARCHAR2(50),
+    CONSTRAINT FK_EMPLOYEE_REGION
+        FOREIGN KEY (REGION_ID)
+        REFERENCES SALES_REGIONS(REGION_ID)
+);
+
+INSERT INTO SALES_EMPLOYEES
+    (EMPLOYEE_ID,
+     EMPLOYEE_NAME,
+     REGION_ID,
+     JOIN_DATE,
+     DESIGNATION)
+SELECT
+    2000 + LEVEL,
+    'Sales Executive ' || LEVEL,
+    MOD(LEVEL - 1, 16) + 1,
+    DATE '2022-01-01'
+        + TRUNC(DBMS_RANDOM.VALUE(0, 1400)),
+    CASE
+        WHEN MOD(LEVEL, 10) = 0 THEN 'Sales Manager'
+        WHEN MOD(LEVEL, 3) = 0 THEN 'Senior Sales Executive'
+        ELSE 'Sales Executive'
+    END
+FROM DUAL
+CONNECT BY LEVEL <= 50;
+
+COMMIT;
+
+Employee IDs:
+
+2001–2050
+
+SALES_ORDERS
+
+This is the order header table.
+
+CREATE TABLE SALES_ORDERS (
+    ORDER_ID NUMBER PRIMARY KEY,
+    ORDER_DATE DATE NOT NULL,
+    CUSTOMER_ID NUMBER NOT NULL,
+    EMPLOYEE_ID NUMBER NOT NULL,
+    REGION_ID NUMBER NOT NULL,
+    ORDER_STATUS VARCHAR2(30),
+    PAYMENT_METHOD VARCHAR2(30)
+);
+
+
+Add customer foreign key
+
+ALTER TABLE SALES_ORDERS
+ADD CONSTRAINT FK_ORDER_CUSTOMER
+FOREIGN KEY (CUSTOMER_ID)
+REFERENCES SALES_CUSTOMERS(CUSTOMER_ID);
+
+Add employee foreign key
+
+ALTER TABLE SALES_ORDERS
+ADD CONSTRAINT FK_ORDER_EMPLOYEE
+FOREIGN KEY (EMPLOYEE_ID)
+REFERENCES SALES_EMPLOYEES(EMPLOYEE_ID);
+
+Add region foreign key
+
+ALTER TABLE SALES_ORDERS
+ADD CONSTRAINT FK_ORDER_REGION
+FOREIGN KEY (REGION_ID)
+REFERENCES SALES_REGIONS(REGION_ID);
+
+
+Generate 10,000 orders
+
+INSERT INTO SALES_ORDERS
+    (ORDER_ID,
+     ORDER_DATE,
+     CUSTOMER_ID,
+     EMPLOYEE_ID,
+     REGION_ID,
+     ORDER_STATUS,
+     PAYMENT_METHOD)
+SELECT
+    50000 + LEVEL,
+    DATE '2023-01-01'
+        + TRUNC(DBMS_RANDOM.VALUE(0, 1360)),
+    1001 + TRUNC(DBMS_RANDOM.VALUE(0, 1000)),
+    2001 + TRUNC(DBMS_RANDOM.VALUE(0, 50)),
+    1 + TRUNC(DBMS_RANDOM.VALUE(0, 16)),
+    CASE
+        WHEN DBMS_RANDOM.VALUE < 0.85 THEN 'Completed'
+        WHEN DBMS_RANDOM.VALUE < 0.95 THEN 'Pending'
+        ELSE 'Cancelled'
+    END,
+    CASE
+        WHEN DBMS_RANDOM.VALUE < 0.30 THEN 'Credit Card'
+        WHEN DBMS_RANDOM.VALUE < 0.55 THEN 'UPI'
+        WHEN DBMS_RANDOM.VALUE < 0.75 THEN 'Bank Transfer'
+        WHEN DBMS_RANDOM.VALUE < 0.90 THEN 'Cash'
+        ELSE 'Debit Card'
+    END
+FROM DUAL
+CONNECT BY LEVEL <= 10000;
+
+COMMIT;
+
+Important
+
+Order IDs:
+
+50001–60000
+
+Total:
+
+10,000 orders
+
+SALES_ORDER_DETAILS
+
+This is the transaction/line-item table.
+
+CREATE TABLE SALES_ORDER_DETAILS (
+    ORDER_DETAIL_ID NUMBER PRIMARY KEY,
+    ORDER_ID NUMBER NOT NULL,
+    PRODUCT_ID NUMBER NOT NULL,
+    QUANTITY NUMBER NOT NULL,
+    UNIT_PRICE NUMBER(10,2) NOT NULL,
+    DISCOUNT_PERCENT NUMBER(5,2) DEFAULT 0
+);
+
+Add order foreign key
+
+ALTER TABLE SALES_ORDER_DETAILS
+ADD CONSTRAINT FK_DETAIL_ORDER
+FOREIGN KEY (ORDER_ID)
+REFERENCES SALES_ORDERS(ORDER_ID);
+
+Add product foreign key
+
+ALTER TABLE SALES_ORDER_DETAILS
+ADD CONSTRAINT FK_DETAIL_PRODUCT
+FOREIGN KEY (PRODUCT_ID)
+REFERENCES SALES_PRODUCTS(PRODUCT_ID);
+
+Generate 50,000 details
+
+INSERT INTO SALES_ORDER_DETAILS
+(
+    ORDER_DETAIL_ID,
+    ORDER_ID,
+    PRODUCT_ID,
+    QUANTITY,
+    UNIT_PRICE,
+    DISCOUNT_PERCENT
+)
+SELECT
+    100000 + ROW_NUMBER() OVER (ORDER BY ORDER_ID, PRODUCT_ID),
+    ORDER_ID,
+    PRODUCT_ID,
+    QUANTITY,
+    UNIT_PRICE,
+    DISCOUNT_PERCENT
+FROM
+(
+    SELECT
+        o.ORDER_ID,
+        p.PRODUCT_ID,
+        TRUNC(DBMS_RANDOM.VALUE(1, 6)) AS QUANTITY,
+        p.UNIT_PRICE,
+        ROUND(DBMS_RANDOM.VALUE(0, 16), 2)
+            AS DISCOUNT_PERCENT
+    FROM SALES_ORDERS o
+    CROSS JOIN SALES_PRODUCTS p
+    WHERE p.PRODUCT_ID IN
+    (
+        101,102,103,104,105,106,107,108,109,110,
+        111,112,113,114,115,116,117,118,119,120
+    )
+)
+WHERE MOD(ORDER_ID + PRODUCT_ID, 8) IN (0,1);
+
+COMMIT;
+
+Important point
+
+This generated:
+
+10,000 orders × 5 product lines = 50,000 details
+
+So every order currently has 5 product lines.
+
+
+SALES_TARGETS
+
+CREATE TABLE SALES_TARGETS (
+    TARGET_ID NUMBER PRIMARY KEY,
+    TARGET_MONTH DATE NOT NULL,
+    REGION_ID NUMBER NOT NULL,
+    TARGET_AMOUNT NUMBER(15,2) NOT NULL
+);
+
+Generate targets
+
+INSERT INTO SALES_TARGETS
+(
+    TARGET_ID,
+    TARGET_MONTH,
+    REGION_ID,
+    TARGET_AMOUNT
+)
+SELECT
+    300000 + ROW_NUMBER() OVER
+        (ORDER BY REGION_ID, TARGET_MONTH),
+    TARGET_MONTH,
+    REGION_ID,
+    ROUND(
+        500000 + DBMS_RANDOM.VALUE(0, 500000),
+        2
+    )
+FROM
+(
+    SELECT
+        ADD_MONTHS(
+            DATE '2023-01-01',
+            LEVEL - 1
+        ) AS TARGET_MONTH
+    FROM DUAL
+    CONNECT BY LEVEL <= 48
+) M
+CROSS JOIN SALES_REGIONS R;
+
+COMMIT;
+
+Important
+
+48 months × 16 regions:
+
+48 × 16 = 768 target rows
+
+Target period:
+January 2023 → December 2026
+
+=============================================================
+
+
+DATA VALIDATION QUERIES
+
+Check invalid customers
+
+SELECT COUNT(*) AS INVALID_CUSTOMER_ORDERS
+FROM SALES_ORDERS O
+LEFT JOIN SALES_CUSTOMERS C
+    ON O.CUSTOMER_ID = C.CUSTOMER_ID
+WHERE C.CUSTOMER_ID IS NULL;
+
+------------------------------------------------------------------
+
+Check invalid order details
+
+SELECT COUNT(*) AS INVALID_ORDER_DETAILS
+FROM SALES_ORDER_DETAILS D
+LEFT JOIN SALES_ORDERS O
+    ON D.ORDER_ID = O.ORDER_ID
+WHERE O.ORDER_ID IS NULL;
+
+----------------------------------------------------------------
+
+Check invalid products
+
+SELECT COUNT(*) AS INVALID_PRODUCT_DETAILS
+FROM SALES_ORDER_DETAILS D
+LEFT JOIN SALES_PRODUCTS P
+    ON D.PRODUCT_ID = P.PRODUCT_ID
+WHERE P.PRODUCT_ID IS NULL;
+
+----------------------------------------------------------------
+Check invalid quantity, price and discount
+
+SELECT
+    COUNT(*) AS INVALID_ROWS
+FROM SALES_ORDER_DETAILS
+WHERE QUANTITY <= 0
+   OR UNIT_PRICE <= 0
+   OR DISCOUNT_PERCENT < 0
+   OR DISCOUNT_PERCENT > 100;
+
+----------------------------------------------------------------
+
+ORDER STATUS VALIDATION
+
+SELECT
+    ORDER_STATUS,
+    COUNT(*) AS ORDER_COUNT
+FROM SALES_ORDERS
+GROUP BY ORDER_STATUS
+ORDER BY ORDER_STATUS;
+
+----------------------------------------------------------------
+PAYMENT METHOD VALIDATION
+
+SELECT
+    PAYMENT_METHOD,
+    COUNT(*) AS ORDER_COUNT
+FROM SALES_ORDERS
+GROUP BY PAYMENT_METHOD
+ORDER BY PAYMENT_METHOD;
+
+----------------------------------------------------------------
+ORDER DATE VALIDATION
+
+
+SELECT
+    MIN(ORDER_DATE) AS FIRST_ORDER_DATE,
+    MAX(ORDER_DATE) AS LAST_ORDER_DATE
+FROM SALES_ORDERS;
+
+------------------------------------------------------------------
+MORE EXPLICIT DATE CHECK
+
+SELECT
+    TO_CHAR(MIN(ORDER_DATE), 'DD-MON-YYYY')
+        AS FIRST_ORDER_DATE,
+    TO_CHAR(MAX(ORDER_DATE), 'DD-MON-YYYY')
+        AS LAST_ORDER_DATE,
+    COUNT(*) AS TOTAL_ORDERS
+FROM SALES_ORDERS;
+
+--------------------------------------------------------------------
+SOURCE-OF-TRUTH — TOTAL SALES
+
+This is extremely important for our Power BI validation.
+
+SELECT
+    ROUND(
+        SUM(
+            QUANTITY * UNIT_PRICE *
+            (1 - DISCOUNT_PERCENT / 100)
+        ),
+        2
+    ) AS TOTAL_SALES
+FROM SALES_ORDER_DETAILS;
+
+
+Actual result
+
+₹2,400,949,378
+
+≈ ₹240.09 Crore
+
+====================================================================
+SOURCE-OF-TRUTH — TOTAL COST
+
+SELECT
+    ROUND(
+        SUM(D.QUANTITY * P.COST_PRICE),
+        2
+    ) AS TOTAL_COST
+FROM SALES_ORDER_DETAILS D
+JOIN SALES_PRODUCTS P
+    ON D.PRODUCT_ID = P.PRODUCT_ID;
+
+Actual result
+
+₹2,030,296,180
+
+====================================================================
+SOURCE-OF-TRUTH — TOTAL PROFIT
+
+
+SELECT
+    ROUND(
+        SUM(
+            D.QUANTITY * D.UNIT_PRICE
+                * (1 - D.DISCOUNT_PERCENT / 100)
+            - D.QUANTITY * P.COST_PRICE
+        ),
+        2
+    ) AS TOTAL_PROFIT
+FROM SALES_ORDER_DETAILS D
+JOIN SALES_PRODUCTS P
+    ON D.PRODUCT_ID = P.PRODUCT_ID;
+
+Actual result
+
+₹370,653,198
